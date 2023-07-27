@@ -1,0 +1,55 @@
+# PROGRAM THAT READS IN CSV DATA, GRAPHS IT, AND PLOTS A TRENDLINE
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from matplotlib.dates import date2num
+
+# Update the filename to match your CSV file
+csv_filename = 'META.csv'
+
+# Read data from the CSV file
+df = pd.read_csv(csv_filename)
+
+# Extract 'date' and 'close' data from the DataFrame
+date_data = pd.to_datetime(df['Date']).values
+close_data = df['Close'].values
+
+# Convert dates to numerical values (timestamps)
+date_numerical = date_data.astype(np.int64)
+
+# Perform logarithmic regression
+# coefficients = np.polyfit(np.log(date_numerical), close_data, 1)
+# logarithmic_trendline = np.poly1d(coefficients)
+
+# Plot the 'close' data against 'date'
+plt.figure(figsize=(10, 6))  # Set the figure size (width, height) to make the graph larger
+plt.plot(date_data, close_data, 'o-', markersize=2,label='Close Data')
+plt.xscale('log')
+plt.xlabel('Date')
+plt.yscale('log')
+plt.ylabel('Close Price')
+plt.title('Close Price vs. Date')
+
+# Plot the trend line (red line connecting the first and last data points)
+plt.plot([date_data[0], date_data[-1]], [close_data[0], close_data[-1]], 'r-', label='Trend Line')
+# plt.plot(date_data, logarithmic_trendline(np.log(date_numerical)), 'r-', label='Logarithmic Trend Line')
+
+plt.legend()
+plt.grid(True)
+plt.xticks(rotation=45)  # Rotate x-axis labels for better readability (optional)
+
+# Add padding to the x-axis and y-axis limits
+x_padding = .1 # Adjust the padding as needed
+y_padding = 20  # Adjust the padding as needed
+
+# Convert dates to numerical values (timestamps) using date2num
+date_data_num = date2num(date_data)
+
+
+#UNHIGLIGHT THESE TO LOOK AT UNISWAP
+plt.xlim(date_data_num.min() - (date_data_num.max() - date_data_num.min()) * x_padding, date_data_num.max() + (date_data_num.max() - date_data_num.min()) * x_padding)
+plt.ylim(close_data.min() / (1 + y_padding), close_data.max() * (1 + y_padding))
+
+plt.tight_layout()  # Ensure all elements fit within the figure area
+plt.show()
